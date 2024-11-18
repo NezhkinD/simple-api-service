@@ -1,0 +1,21 @@
+version: '3'
+services:
+    php-fpm:
+        restart: always
+        container_name: sas_php
+        build:
+            context: .docker/php
+        volumes:
+            - ./app:/home/app
+
+    nginx:
+        restart: always
+        container_name: sas_nginx
+        build:
+            context: .docker/nginx
+        volumes:
+            - ./app:/home/app
+        ports:
+            - "8891:80"
+        depends_on:
+            - php-fpm
