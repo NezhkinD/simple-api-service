@@ -31,5 +31,8 @@ unlock:
 composer_update:
 	docker exec -it sas_php composer update
 
+test:
+	docker exec -it sas_php php bin/phpunit
+
 # Запуск приложения
 run: build_no_cache up composer_update
