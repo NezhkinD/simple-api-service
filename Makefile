@@ -41,4 +41,4 @@ pull:
 run: build_no_cache up composer_update
 
 # Рестарт приложения, с получением актуальных данных из репозитория
-rerun: pull build_no_cache up composer_update
+rerun: down pull build_no_cache up composer_update
