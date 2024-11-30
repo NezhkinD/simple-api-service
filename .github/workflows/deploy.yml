@@ -1,5 +1,6 @@
 name: Deploy to Remote Server
 
+# Запуск pipeline при пуше в main
 on:
     push:
         branches:
@@ -7,16 +8,21 @@ on:
 
 jobs:
     deploy:
+        # ОС виртуальной машины, на которой будет запускаться наше приложение
         runs-on: ubuntu-latest
 
         steps:
+            # Добавляем приватный ключ (для подключения к 176.123.160.245) в id_rsa (приватный ключ, предварительно нужно добавить GitHub Secrets)
+            # Далее даем права на файл id_rsa и прописываем хост 176.123.160.245 в файле known_hosts (для того чтобы не было вопросов при подключении)
             -   name: Set up SSH
                 run: |
-                    mkdir -p ~/.ssh
-                    echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
-                    chmod 600 ~/.ssh/id_rsa
-                    ssh-keyscan -H 176.123.160.245 >> ~/.ssh/known_hosts
+                    mkdir -p ~/.ssh  
+                    echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa  
+                    chmod 600 ~/.ssh/id_rsa  
+                    ssh-keyscan -H 176.123.160.245 >> ~/.ssh/known_hosts  
 
+            # В env указываем параметры для подключения к 176.123.160.245
+            # Подключаемся к хосту и выполняем команды (получение обновлений  main через гит -> остановка всех контейнеров -> билд контейнеров -> запуск контейнеров -> обновление пакетов composer)
             -   name: Deploy application
                 env:
                     REMOTE_USER: "dnezhkin"                                        # Имя пользователя на сервере

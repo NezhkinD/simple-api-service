@@ -8,12 +8,8 @@ on:
 
 jobs:
     build-and-test:
+        # ОС виртуальной машины, на которой будет запускаться наше приложение
         runs-on: ubuntu-latest
-
-        services:
-            # Настраиваем Docker Compose
-            docker:
-                image: docker/compose:latest
 
         steps:
             # Клонируем репозиторий
@@ -23,18 +19,18 @@ jobs:
             # Устанавливаем Docker Compose
             -   name: Set up Docker Compose
                 run: |
-                    sudo apt-get update
-                    sudo apt-get install -y docker-compose
+                    sudo apt-get update  
+                    sudo apt-get install -y docker-compose  
 
-            # Показать список файлов
+            # Показать список файлов (для простоты отладки)
             -   name: List repository files
                 run: ls -R
 
-            # Сборка контейнеров через Docker Compose
+            # Сборка контейнеров через docker-compose
             -   name: Build Docker containers
                 run: docker-compose -f docker-compose.yaml build
 
-            # Запускаем сервисы через Docker Compose
+            # Запускаем сервисы через docker-compose
             -   name: Start Docker Compose services
                 run: docker-compose -f docker-compose.yaml up -d
 
