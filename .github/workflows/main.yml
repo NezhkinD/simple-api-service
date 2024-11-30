@@ -1,0 +1,42 @@
+name: Build and Test
+
+on:
+    push:
+        branches-ignore:
+            - main  # Исключаем векту main
+    pull_request:
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+
+        services:
+            # Настраиваем Docker Compose
+            docker:
+                image: docker/compose:latest
+
+        steps:
+            # Клонируем репозиторий
+            -   name: Checkout code
+                uses: actions/checkout@v3
+
+            # Сборка контейнеров через Docker Compose
+            -   name: Build Docker containers
+                run: docker-compose -f docker-compose.yml build
+
+            # Запускаем сервисы через Docker Compose
+            -   name: Start Docker Compose services
+                run: docker-compose -f docker-compose.yml up -d
+
+            # Установка зависимостей через Composer
+            -   name: Install dependencies
+                run: docker exec sas_php composer install
+
+            # Запуск тестов
+            -   name: Run PHPUnit tests
+                run: docker exec sas_php php bin/phpunit
+
+            # Остановка и удаление контейнеров
+            -   name: Stop and clean up Docker Compose
+                if: always()
+                run: docker-compose -f docker-compose.yml down
