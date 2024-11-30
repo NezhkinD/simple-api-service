@@ -32,11 +32,11 @@ jobs:
 
             # Сборка контейнеров через Docker Compose
             -   name: Build Docker containers
-                run: docker-compose -f docker-compose.yml build
+                run: docker-compose -f docker-compose.yaml build
 
             # Запускаем сервисы через Docker Compose
             -   name: Start Docker Compose services
-                run: docker-compose -f docker-compose.yml up -d
+                run: docker-compose -f docker-compose.yaml up -d
 
             # Установка зависимостей через Composer
             -   name: Install dependencies
@@ -49,4 +49,4 @@ jobs:
             # Остановка и удаление контейнеров
             -   name: Stop and clean up Docker Compose
                 if: always()
-                run: docker-compose -f docker-compose.yml down
+                run: docker-compose -f docker-compose.yaml down
