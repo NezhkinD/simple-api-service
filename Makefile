@@ -34,5 +34,11 @@ composer_update:
 test:
 	docker exec -it sas_php php bin/phpunit
 
+pull:
+	git pull
+
 # Запуск приложения
 run: build_no_cache up composer_update
+
+# Рестарт приложения, с получением актуальных данных из репозитория
+rerun: pull build_no_cache up composer_update
