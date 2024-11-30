@@ -1,0 +1,29 @@
+name: Deploy to Remote Server
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Set up SSH
+              run: |
+                  mkdir -p ~/.ssh
+                  echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
+                  chmod 600 ~/.ssh/id_rsa
+                  ssh-keyscan -H remote-server >> ~/.ssh/known_hosts
+
+            - name: Deploy application
+              env:
+                  REMOTE_USER: "dnezhkin"                                        # Имя пользователя на сервере
+                  REMOTE_HOST: "176.123.160.245"                                 # Адрес сервера
+                  REMOTE_PATH: "/home/dnezhkin/apps/simple-api-service"          # Путь к приложению на сервере
+              run: |
+                  ssh ${REMOTE_USER}@${REMOTE_HOST} "cd ${REMOTE_PATH} && make rerun"
