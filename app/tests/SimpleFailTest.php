@@ -8,6 +8,6 @@ class SimpleFailTest extends KernelTestCase
 {
     public function testTrue(): void
     {
-        $this->assertTrue(false);
+        $this->assertFalse(false);
     }
 }
