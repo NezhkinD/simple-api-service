@@ -10,7 +10,7 @@ jobs:
     build-and-test:
         strategy:
             matrix:
-                os: [ubuntu-latest, macos-latest]  # Добавляем ОС
+                os: [ ubuntu-latest, macos-latest ]  # Добавляем ОС
         runs-on: ${{ matrix.os }}  # Используем текущую ОС из матрицы
 
         services:
@@ -23,11 +23,20 @@ jobs:
             -   name: Checkout code
                 uses: actions/checkout@v3
 
-            # Устанавливаем Docker Compose
+            # Устанавливаем Docker Compose (только для Linux)
             -   name: Set up Docker Compose
+                if: runner.os == 'Linux'
                 run: |
                     sudo apt-get update
                     sudo apt-get install -y docker-compose
+
+            # Устанавливаем Docker на macOS
+            -   name: Install Docker on macOS
+                if: runner.os == 'macOS'
+                run: |
+                    brew install --cask docker
+                    open /Applications/Docker.app
+                    sleep 10  # Ожидаем запуска Docker Engine
 
             # Показать список файлов
             -   name: List repository files
