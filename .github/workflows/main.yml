@@ -8,7 +8,10 @@ on:
 
 jobs:
     build-and-test:
-        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-latest]  # Добавляем ОС
+        runs-on: ${{ matrix.os }}  # Используем текущую ОС из матрицы
 
         services:
             # Настраиваем Docker Compose
