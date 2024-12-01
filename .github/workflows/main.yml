@@ -25,10 +25,16 @@ jobs:
                     sudo apt-get update
                     sudo apt-get install -y docker-compose
 
-            # Устанавливаем docker-compose (только для Windows)
-            -   name: Set up Docker Compose
-                if: runner.os == 'Windows'
-                run: choco install docker-desktop
+            # Устанавливаем Docker и Docker Compose на Windows
+            - name: Install Docker and Docker Compose (Windows only)
+              if: runner.os == 'Windows'
+              run: |
+                  choco install docker-desktop -y
+                  refreshenv
+                  Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe" -ArgumentList "--quiet" -NoNewWindow -Wait
+                  sleep 15 # Ждём запуска Docker Desktop
+                  docker --version
+                  docker-compose --version
 
             # Устанавливаем docker-compose (только для Windows)
             -   name: Set up Docker Compose
