@@ -25,20 +25,15 @@ jobs:
                     sudo apt-get update
                     sudo apt-get install -y docker-compose
 
-            # Устанавливаем Docker на macOS
+            # Устанавливаем docker и docker-compose на macOS
             # Ожидаем запуска docker-compose
             -   name: Install Docker on macOS
                 if: runner.os == 'macOS'
                 run: |
                     brew install --cask docker
                     open /Applications/Docker.app
-                    sleep 10  # Ожидаем запуска Docker Engine
-
-            # Устанавливаем docker-compose
-            -   name: Install Docker on macOS
-                if: runner.os == 'macOS'
-                run: |
                     brew install docker-compose
+                    sleep 10  # Ожидаем запуска Docker Engine
 
             # Показать список файлов
             -   name: List repository files
@@ -47,21 +42,21 @@ jobs:
 
             # Сборка контейнеров через docker-compose
             -   name: Build Docker containers
-                run: docker-compose -f docker-compose.yaml build
+                run: sudo docker-compose -f docker-compose.yaml build
 
             # Запускаем сервисы через docker-compose
             -   name: Start Docker Compose services
-                run: docker-compose -f docker-compose.yaml up -d
+                run: sudo docker-compose -f docker-compose.yaml up -d
 
             # Установка зависимостей через Composer
             -   name: Install dependencies
-                run: docker exec sas_php composer install
+                run: sudo docker exec sas_php composer install
 
             # Запуск тестов
             -   name: Run PHPUnit tests
-                run: docker exec sas_php php bin/phpunit
+                run: sudo docker exec sas_php php bin/phpunit
 
             # Остановка и удаление контейнеров
             -   name: Stop and clean up Docker Compose
                 if: always()
-                run: docker-compose -f docker-compose.yaml down
+                run: sudo docker-compose -f docker-compose.yaml down
