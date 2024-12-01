@@ -14,10 +14,6 @@ jobs:
         runs-on: ${{ matrix.os }}  # Используем текущую ОС из матрицы
 
         services:
-            # Настраиваем Docker Compose
-            docker:
-                if: runner.os == 'Linux'
-                image: docker/compose:latest
 
         steps:
             # Клонируем репозиторий
