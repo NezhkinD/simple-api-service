@@ -32,38 +32,42 @@ jobs:
                 run: |
                     brew install php
                     brew install composer
-                    composer update
 
             # Показать список файлов (для отладки)
             -   name: List repository files
                 run: ls -R
 
             # Сборка контейнеров через docker-compose (Linux)
-            -   name: Build Docker containers
+            -   name: Build Docker containers (Linux only)
                 if: runner.os == 'Linux'
                 run: docker-compose -f docker-compose.yaml build
 
             # Запускаем сервисы через docker-compose (Linux)
-            -   name: Start Docker Compose services
+            -   name: Start Docker Compose services (Linux only)
                 if: runner.os == 'Linux'
                 run: docker-compose -f docker-compose.yaml up -d
 
             # Установка зависимостей через Composer (Linux)
-            -   name: Install dependencies
+            -   name: Install dependencies (Linux only)
                 if: runner.os == 'Linux'
                 run: docker exec sas_php composer install
 
+            # Установка зависимостей через Composer (Linux)
+            -   name: Install dependencies (macOS only)
+                if: runner.os == 'macOS'
+                run: composer update
+
             # Запуск тестов (Linux)
-            -   name: Run PHPUnit tests
+            -   name: Run PHPUnit tests (Linux only)
                 if: runner.os == 'Linux'
                 run: docker exec sas_php php bin/phpunit
 
             # Запуск тестов (Mac)
-            -   name: Run PHPUnit tests
+            -   name: Run PHPUnit tests (macOS only)
                 if: runner.os == 'macOS'
                 run: php ./bin/phpunit
 
             # Остановка и удаление контейнеров
-            -   name: Stop and clean up Docker Compose
+            -   name: Stop and clean up Docker Compose (Linux only)
                 if: always() && runner.os == 'Linux'
                 run: docker-compose -f docker-compose.yaml down
