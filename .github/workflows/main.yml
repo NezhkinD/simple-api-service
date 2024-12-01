@@ -25,23 +25,20 @@ jobs:
                     sudo apt-get update
                     sudo apt-get install -y docker-compose
 
-            # Устанавливаем Docker и Docker Compose на Windows
-            - name: Install Docker and Docker Compose (Windows only)
-              if: runner.os == 'Windows'
-              run: |
-                  choco install docker-desktop -y
-                  "$Env:Path = [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ';C:\Program Files\Docker\Docker\resources\bin'"
-                  Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe" -ArgumentList "--register-service" -NoNewWindow -Wait
-                  Start-Sleep -Seconds 15  # Ждём, пока Docker Engine запустится
-                  docker --version
-                  docker-compose --version
-
             # Устанавливаем docker-compose (только для Windows)
             -   name: Set up Docker Compose
                 if: runner.os == 'Windows'
                 run: |
                     choco install php --version=8.1.0 -y
-                    choco install composer -y       
+                    choco install composer -y   
+                    refreshenv
+
+            # Проверка версий PHP и Composer
+            -   name: Check PHP and Composer versions (Windows only)
+                if: runner.os == 'Windows'
+                run: |
+                    php --version
+                    composer --version
 
             # Устанавливаем php и composer на macOS
             # Загружаем пакеты через composer
@@ -62,17 +59,17 @@ jobs:
 
             # Сборка контейнеров через docker-compose (Linux)
             -   name: Build Docker containers (Linux only)
-                if: runner.os != 'macOS'
+                if: runner.os == 'Linux'
                 run: docker-compose -f docker-compose.yaml build
 
             # Запускаем сервисы через docker-compose (Linux)
             -   name: Start Docker Compose services (Linux only)
-                if: runner.os != 'macOS'
+                if: runner.os == 'Linux'
                 run: docker-compose -f docker-compose.yaml up -d
 
             # Установка зависимостей через Composer (Linux)
             -   name: Install dependencies (Linux only)
-                if: runner.os != 'macOS'
+                if: runner.os == 'Linux'
                 run: docker exec sas_php composer install
 
             # Установка зависимостей через Composer (Linux)
@@ -82,7 +79,7 @@ jobs:
 
             # Запуск тестов (Linux)
             -   name: Run PHPUnit tests (Linux only)
-                if: runner.os != 'macOS'
+                if: runner.os == 'Linux'
                 run: docker exec sas_php php bin/phpunit
 
             # Запуск тестов (Mac)
@@ -92,5 +89,5 @@ jobs:
 
             # Остановка и удаление контейнеров
             -   name: Stop and clean up Docker Compose (Linux only)
-                if: always() && runner.os != 'macOS'
+                if: always() && runner.os == 'Linux'
                 run: docker-compose -f docker-compose.yaml down
