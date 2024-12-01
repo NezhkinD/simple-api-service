@@ -69,7 +69,7 @@ jobs:
             # Запуск тестов (Mac)
             -   name: Run PHPUnit tests (macOS only)
                 if: runner.os == 'macOS'
-                run: php ./app/bin/phpunit
+                run: cd ./app && php ./bin/phpunit
 
             # Остановка и удаление контейнеров
             -   name: Stop and clean up Docker Compose (Linux only)
