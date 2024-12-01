@@ -60,7 +60,7 @@ jobs:
             -   name: Install dependencies (macOS only)
                 if: runner.os == 'macOS'
                 run: |
-                    cd
+                    cd ./app
                     composer update
 
             # Запуск тестов (Linux)
@@ -71,9 +71,7 @@ jobs:
             # Запуск тестов (Mac)
             -   name: Run PHPUnit tests (macOS only)
                 if: runner.os == 'macOS'
-                run: |
-                    cd
-                    php ./app/bin/phpunit
+                run: php ./app/bin/phpunit
 
             # Остановка и удаление контейнеров
             -   name: Stop and clean up Docker Compose (Linux only)
