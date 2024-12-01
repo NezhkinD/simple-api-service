@@ -30,42 +30,34 @@ jobs:
             -   name: Install Docker on macOS
                 if: runner.os == 'macOS'
                 run: |
-                    brew install --cask docker
-                    open /Applications/Docker.app
-                    brew install docker-compose
-                    sleep 10  # Ожидаем запуска Docker Engine
-
-            # Настраиваем docker на macOS
-            -   name: Install Docker on macOS
-                if: runner.os == 'macOS'
-                run: |
-                    sudo usermod -aG docker $(whoami)
-                    open /Applications/Docker.app
-                    sleep 10 
-                    docker ps
+                    brew install php
+                    brew install composer
 
             # Показать список файлов
             -   name: List repository files
-                if: runner.os == 'Linux'
                 run: ls -R
 
             # Сборка контейнеров через docker-compose
             -   name: Build Docker containers
+                if: runner.os == 'Linux'
                 run: docker-compose -f docker-compose.yaml build
 
             # Запускаем сервисы через docker-compose
             -   name: Start Docker Compose services
+                if: runner.os == 'Linux'
                 run: docker-compose -f docker-compose.yaml up -d
 
             # Установка зависимостей через Composer
             -   name: Install dependencies
+                if: runner.os == 'Linux'
                 run: docker exec sas_php composer install
 
             # Запуск тестов
             -   name: Run PHPUnit tests
+                if: runner.os == 'Linux'
                 run: docker exec sas_php php bin/phpunit
 
             # Остановка и удаление контейнеров
             -   name: Stop and clean up Docker Compose
-                if: always()
+                if: always() && runner.os == 'Linux'
                 run: docker-compose -f docker-compose.yaml down
