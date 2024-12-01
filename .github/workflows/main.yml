@@ -39,6 +39,7 @@ jobs:
                 run: |
                     ls -R
                     pwd
+                    ls -la
 
             # Сборка контейнеров через docker-compose (Linux)
             -   name: Build Docker containers (Linux only)
@@ -58,7 +59,9 @@ jobs:
             # Установка зависимостей через Composer (Linux)
             -   name: Install dependencies (macOS only)
                 if: runner.os == 'macOS'
-                run: composer update
+                run: |
+                    cd
+                    composer update
 
             # Запуск тестов (Linux)
             -   name: Run PHPUnit tests (Linux only)
@@ -68,7 +71,9 @@ jobs:
             # Запуск тестов (Mac)
             -   name: Run PHPUnit tests (macOS only)
                 if: runner.os == 'macOS'
-                run: php ./bin/phpunit
+                run: |
+                    cd
+                    php ./app/bin/phpunit
 
             # Остановка и удаление контейнеров
             -   name: Stop and clean up Docker Compose (Linux only)
