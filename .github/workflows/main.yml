@@ -18,15 +18,15 @@ jobs:
             -   name: Checkout code
                 uses: actions/checkout@v3
 
-            # Устанавливаем docker-compose (только для Linux)
-            -   name: Set up Docker Compose
+            # Устанавливаем docker-compose (Linux)
+            -   name: Set up Docker Compose (Linux)
                 if: runner.os == 'Linux'
                 run: |
                     sudo apt-get update
                     sudo apt-get install -y docker-compose
 
-            # Устанавливаем docker-compose (только для Windows)
-            -   name: Set up Docker Compose
+            # Устанавливаем php, composer (Windows)
+            -   name: Install php, composer (Windows)
                 if: runner.os == 'Windows'
                 run: |
                     choco install php --version=8.1.0 -y
@@ -34,23 +34,22 @@ jobs:
                     Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
                     refreshenv
 
-            # Проверка версий PHP и Composer
-            -   name: Check PHP and Composer versions (Windows only)
+            # Устанавливаем php, composer (MacOS)
+            -   name: Install php, composer (MacOS)
+                if: runner.os == 'macOS'
+                run: |
+                    brew install php
+                    brew install composer
+                    
+
+            # Проверка версий PHP и Composer (Windows)
+            -   name: Check PHP and Composer versions (Windows)
                 if: runner.os == 'Windows'
                 run: |
                     php --version
                     composer --version
 
-            # Устанавливаем php и composer на macOS
-            # Загружаем пакеты через composer
-            -   name: Install php, composer, make (macOS only)
-                if: runner.os == 'macOS'
-                run: |
-                    brew install php
-                    brew install composer
-                    brew install make
-
-            # Показать список файлов (для отладки)
+            # Показать список файлов (для отладки MacOS, Linux)
             -   name: List repository files
                 if: runner.os != 'Windows'
                 run: |
@@ -59,36 +58,36 @@ jobs:
                     ls -la
 
             # Сборка контейнеров через docker-compose (Linux)
-            -   name: Build Docker containers (Linux only)
+            -   name: Build Docker containers (Linux)
                 if: runner.os == 'Linux'
                 run: docker-compose -f docker-compose.yaml build
 
             # Запускаем сервисы через docker-compose (Linux)
-            -   name: Start Docker Compose services (Linux only)
+            -   name: Start Docker Compose services (Linux)
                 if: runner.os == 'Linux'
                 run: docker-compose -f docker-compose.yaml up -d
 
             # Установка зависимостей через Composer (Linux)
-            -   name: Install dependencies (Linux only)
+            -   name: Install dependencies (Linux)
                 if: runner.os == 'Linux'
                 run: docker exec sas_php composer install
 
-            # Установка зависимостей через Composer (Linux)
-            -   name: Install dependencies (macOS only)
+            # Установка зависимостей через Composer (Windows and macOS)
+            -   name: Install dependencies (Windows and macOS)
                 if: runner.os != 'Linux'
                 run: cd ./app && composer update
 
             # Запуск тестов (Linux)
-            -   name: Run PHPUnit tests (Linux only)
+            -   name: Run PHPUnit tests (Linux)
                 if: runner.os == 'Linux'
                 run: docker exec sas_php php bin/phpunit
 
-            # Запуск тестов (Mac)
-            -   name: Run PHPUnit tests (macOS only)
+            # Запуск тестов (Windows, Mac)
+            -   name: Run PHPUnit tests (Windows and macOS)
                 if: runner.os != 'Linux'
                 run: cd ./app && php ./bin/phpunit
 
-            # Остановка и удаление контейнеров
-            -   name: Stop and clean up Docker Compose (Linux only)
+            # Остановка и удаление контейнеров (Linux)
+            -   name: Stop and clean up Docker Compose (Linux)
                 if: always() && runner.os == 'Linux'
                 run: docker-compose -f docker-compose.yaml down
