@@ -48,6 +48,7 @@ jobs:
 
             # Показать список файлов (для отладки)
             -   name: List repository files
+                if: runner.os != 'Windows'
                 run: |
                     ls -R
                     pwd
