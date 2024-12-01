@@ -10,7 +10,7 @@ jobs:
     build-and-test:
         strategy:
             matrix:
-                os: [ ubuntu-latest, macos-latest ]  # Добавляем ОС
+                os: [ ubuntu-latest, macos-latest, windows-latest]  # Добавляем ОС
         runs-on: ${{ matrix.os }}  # Используем текущую ОС из матрицы
 
         services:
@@ -31,15 +31,16 @@ jobs:
                     sudo apt-get install -y docker-compose
 
             # Устанавливаем Docker на macOS
+            # Ожидаем запуска Docker Engine
             -   name: Install Docker on macOS
                 if: runner.os == 'macOS'
                 run: |
-                    brew install --cask docker
-                    open /Applications/Docker.app
-                    sleep 10  # Ожидаем запуска Docker Engine
+                    brew install docker-compose
+                    sleep 10 
 
             # Показать список файлов
             -   name: List repository files
+                if: runner.os == 'Linux'
                 run: ls -R
 
             # Сборка контейнеров через Docker Compose
