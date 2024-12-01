@@ -30,9 +30,9 @@ jobs:
               if: runner.os == 'Windows'
               run: |
                   choco install docker-desktop -y
-                  refreshenv
-                  Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe" -ArgumentList "--quiet" -NoNewWindow -Wait
-                  sleep 15 # Ждём запуска Docker Desktop
+                  "$Env:Path = [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ';C:\Program Files\Docker\Docker\resources\bin'"
+                  Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe" -ArgumentList "--register-service" -NoNewWindow -Wait
+                  Start-Sleep -Seconds 15  # Ждём, пока Docker Engine запустится
                   docker --version
                   docker-compose --version
 
