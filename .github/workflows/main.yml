@@ -75,7 +75,7 @@ jobs:
 
             # Установка зависимостей через Composer (Linux)
             -   name: Install dependencies (macOS only)
-                if: runner.os == 'macOS'
+                if: runner.os != 'Linux'
                 run: cd ./app && composer update
 
             # Запуск тестов (Linux)
@@ -85,7 +85,7 @@ jobs:
 
             # Запуск тестов (Mac)
             -   name: Run PHPUnit tests (macOS only)
-                if: runner.os == 'macOS'
+                if: runner.os != 'Linux'
                 run: cd ./app && php ./bin/phpunit
 
             # Остановка и удаление контейнеров
