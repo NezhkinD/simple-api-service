@@ -27,15 +27,18 @@ jobs:
 
             # Устанавливаем php и composer на macOS
             # Загружаем пакеты через composer
-            -   name: Install Docker on macOS
+            -   name: Install php, composer, make (macOS only)
                 if: runner.os == 'macOS'
                 run: |
                     brew install php
                     brew install composer
+                    brew install make
 
             # Показать список файлов (для отладки)
             -   name: List repository files
-                run: ls -R
+                run: |
+                    ls -R
+                    pwd
 
             # Сборка контейнеров через docker-compose (Linux)
             -   name: Build Docker containers (Linux only)
