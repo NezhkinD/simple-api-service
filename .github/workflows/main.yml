@@ -25,37 +25,43 @@ jobs:
                     sudo apt-get update
                     sudo apt-get install -y docker-compose
 
-            # Устанавливаем docker и docker-compose на macOS
-            # Ожидаем запуска docker-compose
+            # Устанавливаем php и composer на macOS
+            # Загружаем пакеты через composer
             -   name: Install Docker on macOS
                 if: runner.os == 'macOS'
                 run: |
                     brew install php
                     brew install composer
+                    composer update
 
-            # Показать список файлов
+            # Показать список файлов (для отладки)
             -   name: List repository files
                 run: ls -R
 
-            # Сборка контейнеров через docker-compose
+            # Сборка контейнеров через docker-compose (Linux)
             -   name: Build Docker containers
                 if: runner.os == 'Linux'
                 run: docker-compose -f docker-compose.yaml build
 
-            # Запускаем сервисы через docker-compose
+            # Запускаем сервисы через docker-compose (Linux)
             -   name: Start Docker Compose services
                 if: runner.os == 'Linux'
                 run: docker-compose -f docker-compose.yaml up -d
 
-            # Установка зависимостей через Composer
+            # Установка зависимостей через Composer (Linux)
             -   name: Install dependencies
                 if: runner.os == 'Linux'
                 run: docker exec sas_php composer install
 
-            # Запуск тестов
+            # Запуск тестов (Linux)
             -   name: Run PHPUnit tests
                 if: runner.os == 'Linux'
                 run: docker exec sas_php php bin/phpunit
+
+            # Запуск тестов (Mac)
+            -   name: Run PHPUnit tests
+                if: runner.os == 'macOS'
+                run: php ./bin/phpunit
 
             # Остановка и удаление контейнеров
             -   name: Stop and clean up Docker Compose
