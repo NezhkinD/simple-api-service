@@ -1,0 +1,15 @@
+version: '3'
+services:
+    php-fpm:
+        restart: always
+        container_name: sas_php
+        image: nezhkind/simple-api-service_php-fpm:latest
+
+    nginx:
+        restart: always
+        container_name: sas_nginx
+        image: nezhkind/simple-api-service_nginx:latest
+        ports:
+            - "8892:80"
+        depends_on:
+            - php-fpm
