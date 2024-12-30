@@ -1,0 +1,93 @@
+name: Build and Test
+
+on:
+    push:
+        branches-ignore:
+            - main  # Исключаем векту main
+    pull_request:
+
+jobs:
+    build-and-test:
+        strategy:
+            matrix:
+                os: [ ubuntu-latest, macos-latest, windows-latest ]  # Добавляем ОС
+        runs-on: ${{ matrix.os }}  # Используем текущую ОС из матрицы
+
+        steps:
+            # Клонируем репозиторий
+            -   name: Checkout code
+                uses: actions/checkout@v3
+
+            # Устанавливаем docker-compose (Linux)
+            -   name: Set up Docker Compose (Linux)
+                if: runner.os == 'Linux'
+                run: |
+                    sudo apt-get update
+                    sudo apt-get install -y docker-compose
+
+            # Устанавливаем php, composer (Windows)
+            -   name: Install php, composer (Windows)
+                if: runner.os == 'Windows'
+                run: |
+                    choco install php --version=8.1.0 -y
+                    choco install composer -y   
+                    Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+                    refreshenv
+
+            # Устанавливаем php, composer (MacOS)
+            -   name: Install php, composer (MacOS)
+                if: runner.os == 'macOS'
+                run: |
+                    brew install php
+                    brew install composer
+                    
+
+            # Проверка версий PHP и Composer (Windows)
+            -   name: Check PHP and Composer versions (Windows)
+                if: runner.os == 'Windows'
+                run: |
+                    php --version
+                    composer --version
+
+            # Показать список файлов (для отладки MacOS, Linux)
+            -   name: List repository files
+                if: runner.os != 'Windows'
+                run: |
+                    ls -R
+                    pwd
+                    ls -la
+
+            # Сборка контейнеров через docker-compose (Linux)
+            -   name: Build Docker containers (Linux)
+                if: runner.os == 'Linux'
+                run: docker-compose -f docker-compose.yaml build
+
+            # Запускаем сервисы через docker-compose (Linux)
+            -   name: Start Docker Compose services (Linux)
+                if: runner.os == 'Linux'
+                run: docker-compose -f docker-compose.yaml up -d
+
+            # Установка зависимостей через Composer (Linux)
+            -   name: Install dependencies (Linux)
+                if: runner.os == 'Linux'
+                run: docker exec sas_php composer install
+
+            # Установка зависимостей через Composer (Windows and macOS)
+            -   name: Install dependencies (Windows and macOS)
+                if: runner.os != 'Linux'
+                run: cd ./app && composer update
+
+            # Запуск тестов (Linux)
+            -   name: Run PHPUnit tests (Linux)
+                if: runner.os == 'Linux'
+                run: docker exec sas_php php bin/phpunit
+
+            # Запуск тестов (Windows, Mac)
+            -   name: Run PHPUnit tests (Windows and macOS)
+                if: runner.os != 'Linux'
+                run: cd ./app && php ./bin/phpunit
+
+            # Остановка и удаление контейнеров (Linux)
+            -   name: Stop and clean up Docker Compose (Linux)
+                if: always() && runner.os == 'Linux'
+                run: docker-compose -f docker-compose.yaml down
