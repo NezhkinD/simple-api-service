@@ -20,6 +20,13 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 ### Устанавливаем рабочую директорию ###
 WORKDIR /home/app
 
+COPY ./app/. .
+RUN chown -R www-data:www-data /var/cache
+RUN chmod -R 775 /var/cache
+
+RUN chown -R root:root /var/cache
+RUN chmod -R 775 /var/cache
+
 ### Открываем docker, какой порт нужно слушать. Этот порт укажем в конфигах nginx для параметра fastcgi_pass, для того что бы nginx проксировал запросы к приложению php ###
 EXPOSE 9000
 
